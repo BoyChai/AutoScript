@@ -8,11 +8,11 @@ port=22
 timeout=2
 
 # 检查是否安装 expect
-if ! rpm -qa expect &>/dev/null; then
+if ! rpm -q expect &>/dev/null; then
     echo "正在安装expect..."
-    yum -y install expect >/dev/null
+    yum -y install expect &>/dev/null
     # 再次检查是否安装成功
-    if ! rpm -qa expect &>/dev/null; then
+    if ! rpm -q expect &>/dev/null; then
         echo "安装expect失败，请手动安装"
         exit 1
     fi
@@ -22,10 +22,10 @@ for i in "${hosts[@]}"; do
         ping -c1 -W1 $i &>/dev/null
         if [ $? -eq 0 ]; then
             (
-                timeout $4 /usr/bin/expect <<-EOF
+                timeout $timeout /usr/bin/expect <<-EOF
 					spawn ssh-copy-id $username@$i -p $port
 					expect {
-						"yes/no"   {send "yes\r";exp_continue}
+						"yes/no"    {send "yes\r";exp_continue}
 						"password" {send "$password\r"} 	
 					}
 					expect eof
